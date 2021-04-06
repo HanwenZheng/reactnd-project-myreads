@@ -2,6 +2,7 @@ import React from "react";
 import { Link, Route } from "react-router-dom";
 
 import * as BooksAPI from "./BooksAPI";
+import Home from "./views/Home";
 import Shelf from "./Components/Shelf";
 import Book from "./Components/Book";
 
@@ -10,9 +11,8 @@ import "./App.css";
 class BooksApp extends React.Component {
   state = {
     books: null, // books retrieved with (token in local storage?)
-    booksIds: null,
-    query: "",
-    queryResult: null,
+    query: "", // search form value
+    queryResult: null, // search result
   };
 
   // dict for creating shelfs
@@ -28,13 +28,6 @@ class BooksApp extends React.Component {
       this.setState({
         books: books,
       });
-      let booksIds = [];
-      for (let book in books) {
-        booksIds.push(book.id);
-      }
-      this.setState({
-        booksIds: booksIds,
-      });
     });
   };
 
@@ -49,10 +42,10 @@ class BooksApp extends React.Component {
     // init books
     !this.state.books && this.updateBooks();
 
-    // create shelfs
-    let shelfs = [];
+    // create shelves
+    let shelves = [];
     for (let shelfTitle in this.shelfDict) {
-      shelfs.push(
+      shelves.push(
         <Shelf
           shelfTitle={shelfTitle}
           _Shelf={this.shelfDict[shelfTitle]}
@@ -78,25 +71,7 @@ class BooksApp extends React.Component {
 
     return (
       <div className="app">
-        <Route
-          exact
-          path="/"
-          render={() => (
-            <div className="list-books">
-              <div className="list-books-title">
-                <h1>MyReads</h1>
-              </div>
-              <div className="list-books-content">
-                <div>{shelfs}</div>
-              </div>
-              <div className="open-search">
-                <Link to="/search">
-                  <button>Add a book</button>
-                </Link>
-              </div>
-            </div>
-          )}
-        />
+        <Route exact path="/" render={() => <Home shelves={shelves} />} />
         <Route
           path="/search"
           render={() => (
@@ -111,15 +86,9 @@ class BooksApp extends React.Component {
                     placeholder="Search by title or author"
                     value={this.state.query}
                     onChange={(event) => {
-                      this.setState({
-                        query: event.target.value,
-                      });
+                      this.setState({ query: event.target.value });
                       BooksAPI.search(this.state.query).then((books) => {
-                        books &&
-                          !("error" in books) &&
-                          this.setState({
-                            queryResult: books,
-                          });
+                        books && !("error" in books) && this.setState({ queryResult: books });
                       });
                     }}
                   />
