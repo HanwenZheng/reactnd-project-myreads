@@ -1,8 +1,9 @@
 import React from "react";
-import { Link, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 
 import * as BooksAPI from "./BooksAPI";
 import Home from "./views/Home";
+import Search from "./views/Search";
 import Shelf from "./Components/Shelf";
 import Book from "./Components/Book";
 
@@ -36,6 +37,11 @@ class BooksApp extends React.Component {
     BooksAPI.update({ id: id }, shelf).then(() => {
       this.updateBooks();
     });
+  };
+
+  // temp solution to setState on parent from child component
+  updateStateHandler = (state) => {
+    this.setState(state);
   };
 
   render() {
@@ -75,29 +81,7 @@ class BooksApp extends React.Component {
         <Route
           path="/search"
           render={() => (
-            <div className="search-books">
-              <div className="search-books-bar">
-                <Link to="/">
-                  <button className="close-search">Close</button>
-                </Link>
-                <div className="search-books-input-wrapper">
-                  <input
-                    type="text"
-                    placeholder="Search by title or author"
-                    value={this.state.query}
-                    onChange={(event) => {
-                      this.setState({ query: event.target.value });
-                      BooksAPI.search(this.state.query).then((books) => {
-                        books && !("error" in books) && this.setState({ queryResult: books });
-                      });
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="search-books-results">
-                <ol className="books-grid">{this.state.query && queryBooks}</ol>
-              </div>
-            </div>
+            <Search queryBooks={queryBooks} state={this.state} updateStateHandler={this.updateStateHandler} />
           )}
         />
       </div>
