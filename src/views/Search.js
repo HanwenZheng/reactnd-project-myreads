@@ -11,6 +11,7 @@ const Search = (props) => {
         </Link>
         <div className="search-books-input-wrapper">
           <input
+            autoFocus="true"
             type="text"
             placeholder="Search by title or author"
             value={props.state.query}
